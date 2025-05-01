@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI E-SPORTS CHATBOT</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<!-- 🎮 Video background -->
+<video autoplay muted loop id="bgVideo">
+  <source src="{{ url_for('static', filename='bg.mp4') }}" type="video/mp4">
+</video>
+
+<!-- Chatbot Container -->
+<div class="background">
+  <div class="neon-border">
+    <h1>🎮 AI E-SPORTS CHATBOT 🎮</h1>
+
+    <div class="chat-box" id="chat-box">
+      <div class="message bot">🔥 Welcome, Gamer! Ready to dominate?</div>
+    </div>
+
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type your move..." autofocus>
+      <button id="send-button">Deploy 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chat script -->
+<script>
+const sendButton = document.getElementById('send-button');
+const userInput = document.getElementById('user-input');
+const chatBox = document.getElementById('chat-box');
+
+sendButton.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') sendMessage();
+});
+
+function addMessage(message, sender) {
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add('message', sender);
+  messageDiv.textContent = message;
+  chatBox.appendChild(messageDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function sendMessage() {
+  const text = userInput.value.trim();
+  if (!text) return;
+
+  addMessage(text, 'user');
+  userInput.value = '';
+
+  addMessage("⚡ Typing...", 'bot');
+
+  const response = await fetch('/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: text })
+  });
+
+  const data = await response.json();
+  const typingMessage = document.querySelector('.bot:last-child');
+  typingMessage.remove();
+
+  addMessage(data.reply, 'bot');
+}
+</script>
+
+</body>
+</html>
